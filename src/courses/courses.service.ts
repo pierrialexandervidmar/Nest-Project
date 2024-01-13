@@ -1,28 +1,23 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Course } from './entities/courses.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CoursesService {
-    private courses: Course[] = [
-        {
-            id: 1,
-            name: 'Angular',
-            description: 'Curso de Angular',
-            tags: ['Angular', 'Frontend', 'Javascript']
-        },
-        {
-            id: 2,
-            name: 'React',
-            description: 'Curso de React',
-            tags: ['React', 'Typescript', 'Frontend']
-        }
-    ]
 
-    findAll(): Course[] {
-        return this.courses;
+    constructor(
+        @InjectRepository(Course)
+        private readonly coursesRepository: Repository<Course>
+    ) {
+
     }
 
-    findOne(id: number): Course {
+    async findAll(): {
+        return this.coursesRepository.find();
+    }
+
+    async findOne(id: number): Course {
         const course = this.courses.find(course => course.id === id);
         if(!course) {
             throw new HttpException(`Course ID ${id} not found`, HttpStatus.NOT_FOUND);
